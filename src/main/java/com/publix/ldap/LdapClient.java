@@ -38,9 +38,11 @@ public class LdapClient {
             props.load(LdapClient.class.getClassLoader().getResourceAsStream("ldap.properties"));
             LdapClient client = new LdapClient(props);
 
-            DirContext ctx = new InitialDirContext();
-            Attributes attrs = ctx.getAttributes(props.getProperty(Context.PROVIDER_URL), new String[] {"supportedSASLMechanisms"});
-            log.info("{}", attrs);
+            try {
+                client.listSupportedSaslMechanisms();
+            } catch (NamingException e) {
+                log.warn("Could not list supported SASL mechanisms", e);
+            }
 
             final DirContext root = client.getRootContext();
             log.debug("root is {}", root.getNameInNamespace());
@@ -51,8 +53,15 @@ public class LdapClient {
             log.error("Unexpected exception caught in main", e);
         }
     }
+
+    private void listSupportedSaslMechanisms() throws NamingException {
+        log.info("Supported SASL Mechanisms:");
+        final DirContext ctx = new InitialLdapContext();
+        Attributes attrs = ctx.getAttributes(props.getProperty(Context.PROVIDER_URL), new String[] {"supportedSASLMechanisms"});
+        log.info("{}", attrs);
+    }
     
-    public DirContext getRootContext() throws NamingException {
+    private DirContext getRootContext() throws NamingException {
         final Hashtable<String, String> env = new Hashtable<String, String>(){{
             put(Context.INITIAL_CONTEXT_FACTORY, props.getProperty(Context.INITIAL_CONTEXT_FACTORY));
             put(Context.PROVIDER_URL, props.getProperty(Context.PROVIDER_URL));
@@ -63,7 +72,7 @@ public class LdapClient {
         return (DirContext) root.lookup("");
     }
 
-    public void search(DirContext root, String name, String filter) throws NamingException {
+    private void search(DirContext root, String name, String filter) throws NamingException {
 
         final NamingEnumeration<SearchResult> results = root.search(name, filter, getSearchControls());
         while(results.hasMore()) {
