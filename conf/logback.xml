@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- Console Appender -->
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%highlight(%-5level) %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.publix.ldap" level="debug" />
+
+    <root level="debug">
+        <appender-ref ref="stdout"/>
+    </root>
+</configuration>
