@@ -60,13 +60,17 @@ public class LdapClient {
         Attributes attrs = ctx.getAttributes(props.getProperty(Context.PROVIDER_URL), new String[] {"supportedSASLMechanisms"});
         log.info("{}", attrs);
     }
-    
+
     private DirContext getRootContext() throws NamingException {
-        final Hashtable<String, String> env = new Hashtable<String, String>(){{
+        final Hashtable<String, String> env = new Hashtable<String, String>() {{
             put(Context.INITIAL_CONTEXT_FACTORY, props.getProperty(Context.INITIAL_CONTEXT_FACTORY));
+            //put("java.naming.ldap.factory.socket", props.getProperty("java.naming.ldap.factory.socket"));
             put(Context.PROVIDER_URL, props.getProperty(Context.PROVIDER_URL));
             put(Context.SECURITY_PRINCIPAL, props.getProperty(Context.SECURITY_PRINCIPAL));
             put(Context.SECURITY_CREDENTIALS, props.getProperty(Context.SECURITY_CREDENTIALS));
+            put(Context.SECURITY_AUTHENTICATION, props.getProperty(Context.SECURITY_AUTHENTICATION));
+            put("com.sun.jndi.ldap.connect.timeout", props.getProperty("com.sun.jndi.ldap.connect.timeout"));
+            put("com.sun.jndi.ldap.read.timeout", props.getProperty("com.sun.jndi.ldap.read.timeout"));
         }};
         final InitialContext root = new InitialLdapContext(env,null);
         return (DirContext) root.lookup("");
